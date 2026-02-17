@@ -1,4 +1,4 @@
-package fr.isen.ribero.thegreatestcocktailapp
+package fr.isen.ribero.thegreatestcocktailapp.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -28,42 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.isen.ribero.thegreatestcocktailapp.R
+import fr.isen.ribero.thegreatestcocktailapp.models.Category
 
-enum class Category {
-    ALCOHOLIC,
-    NON_ALCOHOLIC,
-    OTHER;
-
-    companion object {
-        fun toString(category: Category): String {
-            return when(category) {
-                ALCOHOLIC -> "Alcoholic"
-                NON_ALCOHOLIC -> "Non alcoholic"
-                OTHER -> "Other / Unknown"
-            }
-        }
-
-        @Composable
-        fun colors(category: Category): List<Color> {
-            return when(category) {
-                ALCOHOLIC -> listOf(
-                    colorResource(R.color.orange_200),
-                    colorResource(R.color.orange_700)
-                )
-
-                NON_ALCOHOLIC -> listOf(
-                    colorResource(R.color.orange_200),
-                    colorResource(R.color.orange_700)
-                )
-
-                OTHER -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun DetailCocktailScreen(modifier: Modifier) {
@@ -78,7 +45,8 @@ fun DetailCocktailScreen(modifier: Modifier) {
                 )
             )
             .fillMaxSize()) {
-        Column(modifier = modifier.fillMaxWidth(),
+        Column(modifier = modifier.fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
                 painterResource(R.drawable.yoghurt_cooler),
@@ -101,8 +69,6 @@ fun DetailCocktailScreen(modifier: Modifier) {
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()
             ) {
-//                Text("Other / Unknown")
-//                Text("Non alcoholic")
                 CategoryView(Category.OTHER)
                 CategoryView(Category.NON_ALCOHOLIC)
             }
@@ -131,7 +97,6 @@ fun DetailCocktailScreen(modifier: Modifier) {
         }
     }
 }
-
 
 @Composable
 fun CategoryView(category: Category) {

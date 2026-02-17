@@ -12,6 +12,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TheGreatestCocktailApp">
         <activity
+            android:name=".DetailCocktailActivity"
+            android:exported="false"
+            android:label="@string/title_activity_detail_cocktail"
+            android:theme="@style/Theme.TheGreatestCocktailApp" />
+        <activity
+            android:name=".DrinksActivity"
+            android:exported="false"
+            android:label="@string/title_activity_drinks"
+            android:theme="@style/Theme.TheGreatestCocktailApp" />
+        <activity
+            android:name=".DrinksActivity.kt"
+            android:exported="false"
+            android:label="@string/title_activity_drinks_activity.kt"
+            android:theme="@style/Theme.TheGreatestCocktailApp" />
+        <activity
+            android:name=".ui.theme.DrinksActivity.kt"
+            android:exported="false"
+            android:label="@string/title_activity_drinks_activity.kt"
+            android:theme="@style/Theme.TheGreatestCocktailApp" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
