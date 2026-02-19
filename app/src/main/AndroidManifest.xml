@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -20,16 +21,6 @@
             android:name=".DrinksActivity"
             android:exported="false"
             android:label="@string/title_activity_drinks"
-            android:theme="@style/Theme.TheGreatestCocktailApp" />
-        <activity
-            android:name=".DrinksActivity.kt"
-            android:exported="false"
-            android:label="@string/title_activity_drinks_activity.kt"
-            android:theme="@style/Theme.TheGreatestCocktailApp" />
-        <activity
-            android:name=".ui.theme.DrinksActivity.kt"
-            android:exported="false"
-            android:label="@string/title_activity_drinks_activity.kt"
             android:theme="@style/Theme.TheGreatestCocktailApp" />
         <activity
             android:name=".MainActivity"
