@@ -1,6 +1,7 @@
 package fr.isen.ribero.thegreatestcocktailapp
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,92 +24,124 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import fr.isen.ribero.thegreatestcocktailapp.screens.CategoriesScreen
+import fr.isen.ribero.thegreatestcocktailapp.dataClasses.CocktailResponse
+import fr.isen.ribero.thegreatestcocktailapp.models.AppBarState
+import fr.isen.ribero.thegreatestcocktailapp.network.ApiClient
 import fr.isen.ribero.thegreatestcocktailapp.screens.BottomAppBar
-import fr.isen.ribero.thegreatestcocktailapp.screens.DetailCocktailScreen
-import fr.isen.ribero.thegreatestcocktailapp.screens.DrinksScreen
+import fr.isen.ribero.thegreatestcocktailapp.screens.CategoriesScreen
+import fr.isen.ribero.thegreatestcocktailapp.screens.RandomCocktailScreen
+import fr.isen.ribero.thegreatestcocktailapp.screens.FavoritesScreen
 import fr.isen.ribero.thegreatestcocktailapp.ui.theme.TheGreatestCocktailAppTheme
+import retrofit2.Call
+import retrofit2.Response
 
 data class TabBarItem(
-    var title : String,
-    var selectedIcon : ImageVector,
-    var unselectedIcon : ImageVector
+    val title: String,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector
 )
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        Log.d("LifeCycle", "MainActivity onCreate")
         setContent {
-            var context = LocalContext.current
+            val context = LocalContext.current
             val navController = rememberNavController()
 
-            val tabItems = listOf(
-            TabBarItem("Random", selectedIcon = Icons.Filled.Home, unselectedIcon = Icons.Outlined.Home),
-            TabBarItem("Category", selectedIcon = Icons.Filled.Menu, unselectedIcon = Icons.Outlined.Menu),
-            TabBarItem("Favorite", selectedIcon = Icons.Filled.Favorite, unselectedIcon = Icons.Outlined.Favorite))
+            val appBarState = remember { mutableStateOf(AppBarState()) }
+
+            val randomItem = TabBarItem(
+                "Random",
+                Icons.Filled.Home,
+                Icons.Outlined.Home
+            )
+            val categoryItem = TabBarItem(
+                "Categories",
+                Icons.Filled.Menu,
+                Icons.Outlined.Menu
+            )
+            val favoriteItem = TabBarItem(
+                "Favorites",
+                Icons.Filled.Favorite,
+                Icons.Outlined.Favorite
+            )
+            val tabItems = listOf(randomItem, categoryItem, favoriteItem)
+
 
             TheGreatestCocktailAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     topBar = {
-                        TopAppBar(
-                            title = {
-                                Text(
-                                    "TopApp Bar"
-                                )
-                            },
-                            actions = {
-                                IconButton({
-                                    Toast.makeText(context, "Add to favorite", Toast.LENGTH_LONG).show()
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.FavoriteBorder,
-                                        contentDescription = "Localized description"
-                                    )
-                                }
-                            })
-                    }, bottomBar = {BottomAppBar(tabItems, navController)}
-                ){ innerPadding ->
-                    NavHost(navController, startDestination = tabItems[0].title){
-                        composable(tabItems[0].title){
+                        TopAppBar({
+                            Text(appBarState.value.title)
+                        }, actions = {
+                            appBarState.value.actions?.invoke(this)
+                        })
+                    },
+                    bottomBar = { BottomAppBar(tabItems, navController) }
+                ) { innerPadding ->
+                    NavHost(navController, startDestination = randomItem.title) {
+                        composable(randomItem.title) {
+                            RandomCocktailScreen(
+                                Modifier.padding(innerPadding),
+                                { topBar ->
+                                    appBarState.value = topBar
+                                })
+                        }
+                        composable(categoryItem.title) {
                             CategoriesScreen(
-                                Modifier.padding(innerPadding))
+                                Modifier.padding(innerPadding),
+                                { topBar ->
+                                    appBarState.value = topBar
+                                })
                         }
-                        composable(tabItems[1].title){
-                            DrinksScreen(
-                                Modifier.padding(innerPadding))
-                        }
-                        composable(tabItems[2].title){
-                            DetailCocktailScreen(
-                                Modifier.padding(innerPadding))
+                        composable(favoriteItem.title) {
+                            FavoritesScreen(
+                                Modifier.padding(innerPadding),
+                                { topBar ->
+                                    appBarState.value = topBar
+                                })
                         }
                     }
                 }
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Row(modifier = modifier) {
-        Text("Hello $name!")
-        Text("Hello Isen")
+    override fun onPause(){
+        super.onPause()
+        Log.d("LifeCycle", "MainActivity onPause")
+    }
+
+    override fun onResume(){
+        super.onResume()
+        Log.d("LifeCycle", "MainActivity onResume")
+    }
+
+    override fun onStop(){
+        super.onStop()
+        Log.d("LifeCycle", "MainActivity onStop")
+    }
+
+    override fun onStart(){
+        super.onStart()
+        Log.d("LifeCycle", "MainActivity onStart")
+    }
+
+    override fun onRestart(){
+        super.onRestart()
+        Log.d("LifeCycle", "MainActivity onRestart")
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TheGreatestCocktailAppTheme {
-        Greeting("Android")
-    }
-}
-
