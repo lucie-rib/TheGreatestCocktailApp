@@ -2,6 +2,7 @@ package fr.isen.ribero.thegreatestcocktailapp.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -238,12 +239,17 @@ fun InfoBadge(text: String) {
 fun DetailCocktailTopButton(drink: Drink?) {
     val context = LocalContext.current
     val favoritesManager = FavoritesManager()
+    var isFavorite by remember(drink?.idDrink) {
+        mutableStateOf(drink?.let { favoritesManager.isFavorite(it, context) } ?: false)
+    }
+
     drink?.let { drink ->
         IconButton({
             favoritesManager.toggleFavorite(drink, context)
+            isFavorite = favoritesManager.isFavorite(drink, context)
         }) {
             Icon(
-                imageVector = if (favoritesManager.isFavorite(drink, context)) {
+                imageVector = if (isFavorite) {
                     Icons.Filled.Favorite
                 } else {
                     Icons.Filled.FavoriteBorder
