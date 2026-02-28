@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +41,7 @@ import coil3.compose.AsyncImage
 import fr.isen.ribero.thegreatestcocktailapp.R
 import fr.isen.ribero.thegreatestcocktailapp.dataClasses.CocktailResponse
 import fr.isen.ribero.thegreatestcocktailapp.dataClasses.Drink
+import fr.isen.ribero.thegreatestcocktailapp.managers.FavoritesManager
 import fr.isen.ribero.thegreatestcocktailapp.models.AppBarState
 import fr.isen.ribero.thegreatestcocktailapp.models.Category
 import fr.isen.ribero.thegreatestcocktailapp.network.ApiClient
@@ -80,10 +82,17 @@ fun RandomCocktailScreen(modifier: Modifier, onComposing: (AppBarState) -> Unit)
 }
 
 @Composable
-fun DetailCocktailScreen(drinkId: String, modifier: Modifier) {
+fun DetailCocktailScreen(drinkId: String,
+                         onComposing: (AppBarState) -> Unit,
+                         modifier: Modifier) {
     var drink = remember { mutableStateOf<Drink?>(null) }
 
     LaunchedEffect(Unit) {
+
+        onComposing (
+            AppBarState("Random Cocktail",
+                actions = { DetailCocktailTopButton(drink.value) })
+        )
         val call = ApiClient.retrofit.getDetailCocktail(drinkId)
         call.enqueue(object : retrofit2.Callback<CocktailResponse> {
             override fun onResponse(
@@ -96,13 +105,13 @@ fun DetailCocktailScreen(drinkId: String, modifier: Modifier) {
                 call: Call<CocktailResponse?>?,
                 t: Throwable?
             ) {
-                Log.e("request", "getDetail failed ${t?.message}")
+                Log.e("request", "getrandom failed ${t?.message}")
             }
         })
     }
 
-    drink.value?.let { currentDrink ->
-        DetailCocktailScreen(modifier, currentDrink)
+    drink.value?.let { drink ->
+        DetailCocktailScreen(modifier, drink)
     } ?: run {
         Text("Loading")
     }
@@ -228,15 +237,20 @@ fun InfoBadge(text: String) {
 @Composable
 fun DetailCocktailTopButton(drink: Drink?) {
     val context = LocalContext.current
-    IconButton({
-        Toast
-            .makeText(context, "Add to favorite", Toast.LENGTH_LONG)
-            .show()
-    }) {
-        Icon(
-            imageVector = Icons.Filled.FavoriteBorder,
-            contentDescription = "Localized description"
-        )
+    val favoritesManager = FavoritesManager()
+    drink?.let { drink ->
+        IconButton({
+            favoritesManager.toggleFavorite(drink, context)
+        }) {
+            Icon(
+                imageVector = if (favoritesManager.isFavorite(drink, context)) {
+                    Icons.Filled.Favorite
+                } else {
+                    Icons.Filled.FavoriteBorder
+                },
+                contentDescription = "Localized description"
+            )
+        }
     }
 }
 
