@@ -58,58 +58,58 @@ enum class Category {
         fun colors(category: Category): List<Color> {
             return when(category) {
                 ALCOHOLIC -> listOf(
-                    colorResource(R.color.orange_200),
-                    colorResource(R.color.orange_700)
+                    colorResource(R.color.cocktail_orange),
+                    colorResource(R.color.cocktail_dark_orange)
                 )
 
                 NON_ALCOHOLIC -> listOf(
-                    colorResource(R.color.orange_200),
-                    colorResource(R.color.orange_700)
+                    colorResource(R.color.cocktail_yellow),
+                    colorResource(R.color.cocktail_orange)
                 )
 
                 OTHER -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.cocktail_pink),
+                    colorResource(R.color.cocktail_orange)
                 )
                 BEER -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.cocktail_yellow),
+                    colorResource(R.color.cocktail_orange)
                 )
                 COCKTAIL -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.cocktail_pink),
+                    colorResource(R.color.cocktail_orange)
                 )
                 COCOA -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.cocktail_pink),
+                    colorResource(R.color.cocktail_orange)
                 )
                 COFFEE -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.cocktail_pink),
+                    colorResource(R.color.cocktail_orange)
                 )
                 LIQUOR -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.cocktail_orange),
+                    colorResource(R.color.cocktail_dark_orange)
                 )
                 DRINK -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.cocktail_yellow),
+                    colorResource(R.color.cocktail_orange)
                 )
                 PUNCH -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.cocktail_pink),
+                    colorResource(R.color.cocktail_orange)
                 )
                 SHAKE -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.cocktail_pink),
+                    colorResource(R.color.cocktail_orange)
                 )
                 SHOT -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.cocktail_orange),
+                    colorResource(R.color.cocktail_dark_orange)
                 )
                 SOFT -> listOf(
-                    colorResource(R.color.teal_200),
-                    colorResource(R.color.teal_700)
+                    colorResource(R.color.cocktail_yellow),
+                    colorResource(R.color.cocktail_orange)
                 )
             }
         }

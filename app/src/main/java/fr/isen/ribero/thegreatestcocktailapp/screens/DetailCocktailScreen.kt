@@ -2,6 +2,7 @@ package fr.isen.ribero.thegreatestcocktailapp.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,7 +38,9 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import coil3.compose.AsyncImage
 import fr.isen.ribero.thegreatestcocktailapp.R
 import fr.isen.ribero.thegreatestcocktailapp.dataClasses.CocktailResponse
@@ -125,8 +128,8 @@ fun DetailCocktailScreen(modifier: Modifier, drink: Drink) {
             .background(
                 brush = Brush.verticalGradient(
                     listOf(
-                        colorResource(R.color.purple_500),
-                        colorResource(R.color.purple_700)
+                        colorResource(R.color.cocktail_orange),
+                        colorResource(R.color.cocktail_pink)
                     )
                 )
             )
@@ -149,15 +152,19 @@ fun DetailCocktailScreen(modifier: Modifier, drink: Drink) {
                     .clip(CircleShape)
                     .border(
                         1.dp,
-                        colorResource(R.color.teal_200),
+                        colorResource(R.color.cocktail_yellow),
                         CircleShape
                     )
             )
 
             Text(
-                drink.strDrink ?: "",
-                fontSize = 40.sp,
-                color = colorResource(R.color.white)
+                text = drink.strDrink ?: "",
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.white),
+                textAlign = TextAlign.Center,
+                lineHeight = 40.sp,
+                modifier = Modifier.fillMaxWidth()
             )
 
             Row(
@@ -170,7 +177,7 @@ fun DetailCocktailScreen(modifier: Modifier, drink: Drink) {
 
             Text(
                 drink.strGlass ?: "",
-                color = colorResource(R.color.grey)
+                color = colorResource(R.color.white)
             )
 
             Card {
@@ -187,7 +194,7 @@ fun DetailCocktailScreen(modifier: Modifier, drink: Drink) {
 
                     val ingredients = drink.ingredientList()
                     if (ingredients.isEmpty()) {
-                        Text("Aucun ingrédient spécifié.")
+                        Text("No ingredients specified")
                     } else {
                         ingredients.forEach { (ingredient, measure) ->
                             val textToDisplay = if (measure.isNotBlank()) "$measure $ingredient" else ingredient
@@ -222,14 +229,14 @@ fun InfoBadge(text: String) {
             .clip(CircleShape)
             .background(
                 Brush.horizontalGradient(
-                    listOf(colorResource(R.color.teal_200), colorResource(R.color.teal_700))
+                    listOf(colorResource(R.color.cocktail_yellow), colorResource(R.color.cocktail_orange))
                 )
             )
     ) {
         Text(
             text = text,
             fontSize = 16.sp,
-            color = colorResource(R.color.white),
+            color = colorResource(R.color.black),
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
         )
     }
@@ -247,6 +254,10 @@ fun DetailCocktailTopButton(drink: Drink?) {
         IconButton({
             favoritesManager.toggleFavorite(drink, context)
             isFavorite = favoritesManager.isFavorite(drink, context)
+
+            if (isFavorite) {
+                Toast.makeText(context, "Added to My Favorites", Toast.LENGTH_SHORT).show()
+            }
         }) {
             Icon(
                 imageVector = if (isFavorite) {
@@ -254,27 +265,13 @@ fun DetailCocktailTopButton(drink: Drink?) {
                 } else {
                     Icons.Filled.FavoriteBorder
                 },
-                contentDescription = "Localized description"
+                contentDescription = "Localized description",
+                tint = if (isFavorite) {
+                    colorResource(R.color.cocktail_pink)
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                }
             )
         }
-    }
-}
-
-@Composable
-fun CategoryView(category: Category) {
-    Box(Modifier
-        .clip(CircleShape)
-        .background(
-            Brush.horizontalGradient(
-                Category.colors(category)
-            )
-        )
-    ) {
-        Text(
-            Category.toString(category),
-            fontSize = 20.sp,
-            color = colorResource(R.color.white),
-            modifier = Modifier.padding(8.dp)
-        )
     }
 }
