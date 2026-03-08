@@ -2,28 +2,15 @@ package fr.isen.ribero.thegreatestcocktailapp.screens
 
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +34,6 @@ import fr.isen.ribero.thegreatestcocktailapp.dataClasses.CocktailResponse
 import fr.isen.ribero.thegreatestcocktailapp.dataClasses.Drink
 import fr.isen.ribero.thegreatestcocktailapp.managers.FavoritesManager
 import fr.isen.ribero.thegreatestcocktailapp.models.AppBarState
-import fr.isen.ribero.thegreatestcocktailapp.models.Category
 import fr.isen.ribero.thegreatestcocktailapp.network.ApiClient
 import retrofit2.Call
 import retrofit2.Response
@@ -56,24 +42,23 @@ import retrofit2.Response
 fun RandomCocktailScreen(modifier: Modifier, onComposing: (AppBarState) -> Unit) {
     var drink = remember { mutableStateOf<Drink?>(null) }
 
-    LaunchedEffect(Unit) {
-        onComposing (
-            AppBarState("Random Cocktail",
-                actions = { DetailCocktailTopButton(drink.value) })
+    LaunchedEffect(drink.value) {
+        onComposing(
+            AppBarState(
+                title = "Random Cocktail",
+                actions = { DetailCocktailTopButton(drink.value) }
+            )
         )
+    }
+
+    LaunchedEffect(Unit) {
         val call = ApiClient.retrofit.getRandomCocktail()
         call.enqueue(object : retrofit2.Callback<CocktailResponse> {
-            override fun onResponse(
-                call: Call<CocktailResponse?>?,
-                response: Response<CocktailResponse?>?
-            ) {
-                drink.value = response?.body()?.drinks?.first()
+            override fun onResponse(call: Call<CocktailResponse?>, response: Response<CocktailResponse?>) {
+                drink.value = response.body()?.drinks?.firstOrNull()
             }
-            override fun onFailure(
-                call: Call<CocktailResponse?>?,
-                t: Throwable?
-            ) {
-                Log.e("request", "getrandom failed ${t?.message}")
+            override fun onFailure(call: Call<CocktailResponse?>, t: Throwable) {
+                Log.e("request", "getrandom failed ${t.message}")
             }
         })
     }
@@ -81,7 +66,9 @@ fun RandomCocktailScreen(modifier: Modifier, onComposing: (AppBarState) -> Unit)
     drink.value?.let { currentDrink ->
         DetailCocktailScreen(modifier, currentDrink)
     } ?: run {
-        Text("Loading")
+        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Loading...")
+        }
     }
 }
 
@@ -90,34 +77,36 @@ fun DetailCocktailScreen(drinkId: String,
                          onComposing: (AppBarState) -> Unit,
                          modifier: Modifier) {
     var drink = remember { mutableStateOf<Drink?>(null) }
+    val context = LocalContext.current
+    val intentName = (context as? android.app.Activity)?.intent?.getStringExtra("DRINK_NAME") ?: "Cocktail Detail"
 
-    LaunchedEffect(Unit) {
-
-        onComposing (
-            AppBarState("Random Cocktail",
-                actions = { DetailCocktailTopButton(drink.value) })
+    LaunchedEffect(drink.value) {
+        onComposing(
+            AppBarState(
+                title = drink.value?.strDrink ?: intentName,
+                actions = { DetailCocktailTopButton(drink.value) }
+            )
         )
+    }
+
+    LaunchedEffect(drinkId) {
         val call = ApiClient.retrofit.getDetailCocktail(drinkId)
         call.enqueue(object : retrofit2.Callback<CocktailResponse> {
-            override fun onResponse(
-                call: Call<CocktailResponse?>?,
-                response: Response<CocktailResponse?>?
-            ) {
-                drink.value = response?.body()?.drinks?.first()
+            override fun onResponse(call: Call<CocktailResponse?>, response: Response<CocktailResponse?>) {
+                drink.value = response.body()?.drinks?.firstOrNull()
             }
-            override fun onFailure(
-                call: Call<CocktailResponse?>?,
-                t: Throwable?
-            ) {
-                Log.e("request", "getrandom failed ${t?.message}")
+            override fun onFailure(call: Call<CocktailResponse?>, t: Throwable) {
+                Log.e("request", "getdetail failed ${t.message}")
             }
         })
     }
 
-    drink.value?.let { drink ->
-        DetailCocktailScreen(modifier, drink)
+    drink.value?.let { drinkItem ->
+        DetailCocktailScreen(modifier, drinkItem)
     } ?: run {
-        Text("Loading")
+        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Loading...")
+        }
     }
 }
 
@@ -147,14 +136,9 @@ fun DetailCocktailScreen(modifier: Modifier, drink: Drink) {
                 model = drink.strDrinkThumb,
                 contentDescription = drink.strDrink,
                 modifier = Modifier
-                    .width(200.dp)
-                    .height(200.dp)
+                    .size(200.dp)
                     .clip(CircleShape)
-                    .border(
-                        1.dp,
-                        colorResource(R.color.cocktail_yellow),
-                        CircleShape
-                    )
+                    .border(1.dp, colorResource(R.color.cocktail_yellow), CircleShape)
             )
 
             Text(
@@ -181,41 +165,23 @@ fun DetailCocktailScreen(modifier: Modifier, drink: Drink) {
             )
 
             Card {
-                Column(
-                    Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        stringResource(R.string.ingredient),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
+                Column(Modifier.padding(16.dp).fillMaxWidth()) {
+                    Text(stringResource(R.string.ingredient), fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     val ingredients = drink.ingredientList()
                     if (ingredients.isEmpty()) {
                         Text("No ingredients specified")
                     } else {
                         ingredients.forEach { (ingredient, measure) ->
-                            val textToDisplay = if (measure.isNotBlank()) "$measure $ingredient" else ingredient
-                            Text(textToDisplay)
+                            Text(if (measure.isNotBlank()) "$measure $ingredient" else ingredient)
                         }
                     }
                 }
             }
 
             Card {
-                Column(
-                    Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        stringResource(R.string.preparation),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(drink.strInstructions ?: "")
+                Column(Modifier.padding(16.dp).fillMaxWidth()) {
+                    Text(stringResource(R.string.preparation), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(drink.strInstructions ?: "No instructions available.")
                 }
             }
         }
@@ -246,31 +212,20 @@ fun InfoBadge(text: String) {
 fun DetailCocktailTopButton(drink: Drink?) {
     val context = LocalContext.current
     val favoritesManager = FavoritesManager()
+
     var isFavorite by remember(drink?.idDrink) {
         mutableStateOf(drink?.let { favoritesManager.isFavorite(it, context) } ?: false)
     }
 
-    drink?.let { drink ->
-        IconButton({
-            favoritesManager.toggleFavorite(drink, context)
-            isFavorite = favoritesManager.isFavorite(drink, context)
-
-            if (isFavorite) {
-                Toast.makeText(context, "Added to My Favorites", Toast.LENGTH_SHORT).show()
-            }
+    drink?.let { currentDrink ->
+        IconButton(onClick = {
+            favoritesManager.toggleFavorite(currentDrink, context)
+            isFavorite = favoritesManager.isFavorite(currentDrink, context)
         }) {
             Icon(
-                imageVector = if (isFavorite) {
-                    Icons.Filled.Favorite
-                } else {
-                    Icons.Filled.FavoriteBorder
-                },
-                contentDescription = "Localized description",
-                tint = if (isFavorite) {
-                    colorResource(R.color.cocktail_pink)
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                }
+                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                contentDescription = "Favorite icon",
+                tint = if (isFavorite) colorResource(R.color.cocktail_pink) else MaterialTheme.colorScheme.onSurface
             )
         }
     }

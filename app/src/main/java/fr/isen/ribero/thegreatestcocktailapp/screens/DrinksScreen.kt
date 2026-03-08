@@ -56,6 +56,7 @@ fun DrinksScreen(modifier: Modifier, category: String) {
                 DrinkPreviewItem(drink) {
                     val intent = Intent(context, DetailCocktailActivity::class.java).apply {
                         putExtra(DetailCocktailActivity.DRINKID, drink.idDrink)
+                        putExtra("DRINK_NAME", drink.strDrink)
                     }
                     context.startActivity(intent)
                 }

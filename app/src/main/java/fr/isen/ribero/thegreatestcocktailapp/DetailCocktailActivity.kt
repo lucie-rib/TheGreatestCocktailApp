@@ -22,25 +22,29 @@ class DetailCocktailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val drinkId = intent.getStringExtra(DRINKID) ?: ""
+        val tempName = intent.getStringExtra("DRINK_NAME") ?: "Cocktail Detail"
+
         enableEdgeToEdge()
         setContent {
-            val appBarState = remember { mutableStateOf(AppBarState()) }
+            val appBarState = remember { mutableStateOf(AppBarState(title = tempName)) }
 
             TheGreatestCocktailAppTheme {
                 Scaffold(
                     topBar = {
                         TopAppBar(
-                            { Text(appBarState.value.title) },
+                            title = { Text(appBarState.value.title) },
                             actions = { appBarState.value.actions?.invoke(this) }
                         )
                     },
-                    modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
                     DetailCocktailScreen(
-                        drinkId= drinkId,
-                        { topBar ->
+                        drinkId = drinkId,
+                        onComposing = { topBar ->
                             appBarState.value = topBar
                         },
-                        Modifier.padding(innerPadding))
+                        modifier = Modifier.padding(innerPadding)
+                    )
                 }
             }
         }
@@ -50,5 +54,3 @@ class DetailCocktailActivity : ComponentActivity() {
         const val DRINKID = "drinkid"
     }
 }
-
-
